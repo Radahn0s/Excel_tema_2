@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Excel - K61-K66: Formatare și Date</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --green: #00c896;
+            --teal: #007a6e;
+            --bg: #0a0f14;
+            --surface: #111820;
+            --surface2: #18232e;
+            --border: rgba(0,200,150,0.15);
+            --text: #e8f4f0;
+            --muted: #7a9e94;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Outfit', sans-serif; background: var(--bg); color: var(--text); height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
+        .topbar { display: flex; align-items: center; justify-content: space-between; padding: 14px 32px; background: var(--surface); border-bottom: 1px solid var(--border); flex-shrink: 0; }
+        .logo { display: flex; align-items: center; gap: 12px; font-size: 20px; font-weight: 800; letter-spacing: -0.5px; }
+        .logo-icon { width: 36px; height: 36px; background: linear-gradient(135deg, var(--green), var(--teal)); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+        .progress-bar { flex: 1; max-width: 300px; margin: 0 40px; height: 4px; background: var(--surface2); border-radius: 2px; overflow: hidden; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, var(--green), var(--teal)); border-radius: 2px; transition: width 0.4s ease; }
+        .slide-counter { font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--muted); }
+        .main { display: flex; flex: 1; overflow: hidden; }
+        .sidebar { width: 240px; background: var(--surface); border-right: 1px solid var(--border); padding: 20px 0; overflow-y: auto; flex-shrink: 0; }
+        .sidebar-title { font-size: 10px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); padding: 0 20px 12px; }
+        .sidebar-item { display: flex; align-items: center; gap: 12px; padding: 12px 20px; cursor: pointer; transition: all 0.2s; border-left: 3px solid transparent; }
+        .sidebar-item:hover { background: var(--surface2); }
+        .sidebar-item.active { background: rgba(0,200,150,0.08); border-left-color: var(--green); }
+        .sidebar-item.active .item-code { color: var(--green); }
+        .item-code { font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 600; color: var(--muted); min-width: 36px; }
+        .item-label { font-size: 13px; line-height: 1.3; }
+        .content-area { flex: 1; overflow: hidden; position: relative; }
+        .slide { position: absolute; inset: 0; opacity: 0; transform: translateY(20px); transition: all 0.4s ease; pointer-events: none; overflow-y: auto; padding: 32px 40px; }
+        .slide.active { opacity: 1; transform: translateY(0); pointer-events: all; }
+        .slide-title { font-size: 28px; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 6px; }
+        .slide-subtitle { color: var(--muted); font-size: 15px; margin-bottom: 28px; }
+        .cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+        .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 20px; transition: border-color 0.2s; }
+        .card:hover { border-color: rgba(0,200,150,0.35); }
+        .card-header { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+        .card-icon { font-size: 22px; }
+        .card-title { font-size: 15px; font-weight: 700; }
+        .card p { font-size: 13px; color: var(--muted); line-height: 1.6; margin-bottom: 8px; }
+        .tag { display: inline-block; font-family: 'JetBrains Mono', monospace; font-size: 11px; background: var(--surface2); border: 1px solid var(--border); color: var(--green); padding: 3px 8px; border-radius: 4px; margin: 2px 2px 2px 0; }
+        .steps { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 24px; margin-bottom: 16px; }
+        .steps h3 { font-size: 16px; font-weight: 700; margin-bottom: 18px; color: var(--green); }
+        .step-item { display: flex; gap: 16px; margin-bottom: 16px; }
+        .step-num { width: 28px; height: 28px; background: linear-gradient(135deg, var(--green), var(--teal)); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; flex-shrink: 0; color: #000; }
+        .step-body strong { display: block; font-size: 14px; margin-bottom: 4px; }
+        .step-body p, .step-body li { font-size: 13px; color: var(--muted); line-height: 1.6; }
+        .step-body ul { padding-left: 16px; }
+        .highlight-box { background: rgba(0,200,150,0.07); border: 1px solid rgba(0,200,150,0.25); border-radius: 10px; padding: 16px 20px; margin: 16px 0; font-size: 13px; line-height: 1.6; }
+        .highlight-box strong { color: var(--green); }
+        .menu-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; padding: 8px 0; }
+        .menu-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 24px 20px; cursor: pointer; transition: all 0.25s; text-align: center; }
+        .menu-card:hover { background: var(--surface2); border-color: var(--green); transform: translateY(-4px); box-shadow: 0 12px 30px rgba(0,200,150,0.15); }
+        .menu-card-icon { font-size: 36px; margin-bottom: 12px; }
+        .menu-card-title { font-size: 14px; font-weight: 700; margin-bottom: 6px; }
+        .menu-card-desc { font-size: 12px; color: var(--muted); line-height: 1.4; }
+        .nav-footer { display: flex; align-items: center; justify-content: flex-end; gap: 10px; padding: 14px 32px; background: var(--surface); border-top: 1px solid var(--border); flex-shrink: 0; }
+        .nav-btn { display: flex; align-items: center; gap: 6px; background: var(--surface2); border: 1px solid var(--border); color: var(--text); padding: 10px 20px; border-radius: 8px; cursor: pointer; font-family: 'Outfit', sans-serif; font-size: 14px; font-weight: 600; transition: all 0.2s; }
+        .nav-btn:hover:not(:disabled) { border-color: var(--green); color: var(--green); }
+        .nav-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+        .nav-btn.primary { background: linear-gradient(135deg, var(--green), var(--teal)); border-color: transparent; color: #000; }
+        .nav-btn.primary:hover:not(:disabled) { opacity: 0.9; color: #000; }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+        .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        @media (max-width: 900px) { .two-col, .menu-grid { grid-template-columns: 1fr 1fr; } .sidebar { display: none; } }
+
+        /* ── ZONE IMAGINI ── */
+        .img-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            margin-top: 20px;
+        }
+        .img-row img {
+            width: 100%;
+            height: 320px;
+            object-fit: contain;
+            border-radius: 10px;
+            background: #0d1a24;
+            border: 1px solid rgba(0,200,150,0.15);
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="topbar">
+        <div class="logo"><div class="logo-icon">📗</div></div>
+        <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:14%"></div></div>
+        <div class="slide-counter" id="slideCounter">1 / 7</div>
+    </div>
+
+    <div class="main">
+        <div class="sidebar">
+            <div class="sidebar-title">Subiecte</div>
+            <div class="sidebar-item active" onclick="goTo(0)" id="nav-0"><span class="item-code">Menu</span><span class="item-label">Pagina principală</span></div>
+            <div class="sidebar-item" onclick="goTo(1)" id="nav-1"><span class="item-code">01</span><span class="item-label">Stiluri de formatare</span></div>
+            <div class="sidebar-item" onclick="goTo(2)" id="nav-2"><span class="item-code">02</span><span class="item-label">Tipuri de date</span></div>
+            <div class="sidebar-item" onclick="goTo(3)" id="nav-3"><span class="item-code">03</span><span class="item-label">Introducere date</span></div>
+            <div class="sidebar-item" onclick="goTo(4)" id="nav-4"><span class="item-code">04</span><span class="item-label">Taste rapide</span></div>
+            <div class="sidebar-item" onclick="goTo(5)" id="nav-5"><span class="item-code">05</span><span class="item-label">Automatizare serii</span></div>
+            <div class="sidebar-item" onclick="goTo(6)" id="nav-6"><span class="item-code">06</span><span class="item-label">Aptitudini practice</span></div>
+        </div>
+
+        <div class="content-area">
+
+            <!-- SLIDE 0: MENU -->
+            <div class="slide active" id="slide-0">
+                <div class="slide-title">📗 Formatare și Date</div>
+                <div class="slide-subtitle">Selectează un subiect pentru a începe</div>
+                <div class="menu-grid">
+                    <div class="menu-card" onclick="goTo(1)"><div class="menu-card-icon">🎨</div><div class="menu-card-title">Stiluri de formatare</div><div class="menu-card-desc">Crearea stilurilor individuale în Excel</div></div>
+                    <div class="menu-card" onclick="goTo(2)"><div class="menu-card-icon">🔢</div><div class="menu-card-title">Tipuri de date</div><div class="menu-card-desc">Număr, text, dată, logic, eroare</div></div>
+                    <div class="menu-card" onclick="goTo(3)"><div class="menu-card-icon">⌨️</div><div class="menu-card-title">Introducere date</div><div class="menu-card-desc">Liste, formulare, meniuri contextuale</div></div>
+                    <div class="menu-card" onclick="goTo(4)"><div class="menu-card-icon">⚡</div><div class="menu-card-title">Taste rapide</div><div class="menu-card-desc">Scurtături și Clipboard</div></div>
+                    <div class="menu-card" onclick="goTo(5)"><div class="menu-card-icon">🔄</div><div class="menu-card-title">Automatizare serii</div><div class="menu-card-desc">Serii de date cu AutoFill</div></div>
+                    <div class="menu-card" onclick="goTo(6)"><div class="menu-card-icon">🎯</div><div class="menu-card-title">Aptitudini practice</div><div class="menu-card-desc">Operații de formatare celule</div></div>
+                </div>
+            </div>
+
+            <!-- SLIDE 1: K61 -->
+            <div class="slide" id="slide-1">
+                <div class="slide-title">🎨 Stiluri de formatare</div>
+                <div class="slide-subtitle">Crearea și aplicarea stilurilor individuale de formatare în Excel</div>
+                <div class="highlight-box"><strong>💡 Ce este un stil?</strong> Un stil este un set salvat de formatări (font, mărime, culoare, borduri, format număr) care poate fi aplicat rapid pe mai multe celule pentru consistență vizuală.</div>
+                <div class="steps">
+                    <h3>📋 Pași pentru stiluri de formatare</h3>
+                    <div class="step-item"><div class="step-num">1</div><div class="step-body"><strong>Aplicare stil predefinit (Cell Styles)</strong><ul><li>Home → Styles → <strong>Cell Styles</strong></li><li>Categorii: Good/Bad/Neutral, Data and Model, Titles, Number Format</li><li>Hover pentru previzualizare, click pentru aplicare</li></ul></div></div>
+                    <div class="step-item"><div class="step-num">2</div><div class="step-body"><strong>Creare stil nou</strong><ul><li>Home → Cell Styles → <strong>New Cell Style…</strong></li><li>Dă un <em>Style Name</em> (ex: „Titlu_Meu")</li><li>Click <strong>Format…</strong> → setează: Number, Alignment, Font, Border, Fill, Protection</li></ul></div></div>
+                    <div class="step-item"><div class="step-num">3</div><div class="step-body"><strong>Modificare stil existent</strong><ul><li>Home → Cell Styles → Click dreapta pe stil → <strong>Modify…</strong></li><li>Schimbă formatarea → OK → Toate celulele cu acel stil se actualizează automat</li></ul></div></div>
+                    <div class="step-item"><div class="step-num">4</div><div class="step-body"><strong>Copiere stiluri între registre</strong><ul><li>Home → Cell Styles → <strong>Merge Styles…</strong></li><li>Alege registrul sursă → stilurile se copiază în registrul curent</li></ul></div></div>
+                    <div class="step-item"><div class="step-num">5</div><div class="step-body"><strong>Format Painter (Pensulă de formate)</strong><ul><li>Selectează celula formatată → Home → <strong>Format Painter</strong></li><li>Click pe celula/zona unde aplici formatarea</li><li>Dublu-click pe Format Painter pentru aplicare multiplă</li></ul></div></div>
+                </div>
+                <div class="cards-grid">
+                    <div class="card"><div class="card-header"><span class="card-icon">🖌️</span><span class="card-title">Formatare manuală</span></div><p>Font, mărime, culoare text, bold/italic/underline, culoare fundal, borduri — toate din ribbon-ul <strong>Home</strong>.</p><span class="tag">Ctrl+B</span><span class="tag">Ctrl+I</span><span class="tag">Ctrl+U</span></div>
+                    <div class="card"><div class="card-header"><span class="card-icon">📐</span><span class="card-title">Format Cells (Ctrl+1)</span></div><p>Dialog complet pentru formatare avansată: Number, Alignment, Font, Border, Fill, Protection.</p><span class="tag">Ctrl+1</span></div>
+                </div>
+                <!-- IMAGINI SLIDE 1 — pune calea screenshot-ului in src="" -->
+                <div class="img-row">
+                    <img src="Screenshot 2026-03-11 094035.png">
+                    <img src="Screenshot 2026-03-11 094829.png">
+                </div>
+            </div>
+
+            <!-- SLIDE 2: K63 -->
+            <div class="slide" id="slide-2">
+                <div class="slide-title">🔢 Tipuri de date</div>
+                <div class="slide-subtitle">Categoriile de date recunoscute de Excel în celule</div>
+                <div class="cards-grid">
+                    <div class="card"><div class="card-header"><span class="card-icon">🔢</span><span class="card-title">Număr (Number)</span></div><p>Valori numerice: întregi, zecimale, negative. Stocate intern ca numere reale. Aliniate automat la dreapta.</p><span class="tag">1234</span><span class="tag">-45.67</span><span class="tag">3.14</span></div>
+                    <div class="card"><div class="card-header"><span class="card-icon">🔤</span><span class="card-title">Text (String)</span></div><p>Orice secvență de caractere. Dacă introduci un număr precedat de apostrof ('), va fi tratat ca text. Aliniat la stânga.</p><span class="tag">'0456</span><span class="tag">„Prenume"</span></div>
+                    <div class="card"><div class="card-header"><span class="card-icon">📅</span><span class="card-title">Dată / Oră (Date/Time)</span></div><p>Stocate intern ca numere (1 = 1 ian 1900). Formatate vizual ca dată sau oră. Pot fi calculate (adunare, scădere).</p><span class="tag">01/03/2025</span><span class="tag">14:30</span></div>
+                    <div class="card"><div class="card-header"><span class="card-icon">✔️</span><span class="card-title">Logic (Boolean)</span></div><p>Valori <strong>TRUE</strong> sau <strong>FALSE</strong>. Rezultate din formule logice (IF, AND, OR). Aliniate centrat.</p><span class="tag">TRUE</span><span class="tag">FALSE</span></div>
+                    <div class="card"><div class="card-header"><span class="card-icon">⚠️</span><span class="card-title">Eroare (Error)</span></div><p>Excel afișează erori când formula nu poate fi calculată.</p><span class="tag">#DIV/0!</span><span class="tag">#VALUE!</span><span class="tag">#REF!</span><span class="tag">#NAME?</span><span class="tag">#N/A</span></div>
+                    <div class="card"><div class="card-header"><span class="card-icon">📐</span><span class="card-title">Formulă (Formula)</span></div><p>Expresii care încep cu <strong>=</strong>. Calculează și returnează valori numerice, text sau logice.</p><span class="tag">=SUM(A1:A5)</span><span class="tag">=A1*B1</span></div>
+                </div>
+                <div class="highlight-box" style="margin-top:16px"><strong>🔍 Recunoaștere automată:</strong> Excel identifică automat tipul de date la introducere. Dacă introduci <code>1/3</code>, Excel poate interpreta ca dată (1 martie). Precedă cu apostrof <code>'</code> sau setează formatul celulei la <em>Text</em> înainte pentru a preveni conversia.</div>
+                <!-- IMAGINI SLIDE 2 — pune calea screenshot-ului in src="" -->
+                <div class="img-row">
+                    <img src="Screenshot 2026-03-11 101038.png">
+                    <img src="Screenshot 2026-03-11 101123.png">
+                </div>
+            </div>
+
+            <!-- SLIDE 3: K64 -->
+            <div class="slide" id="slide-3">
+                <div class="slide-title">⌨️ Metode de introducere date</div>
+                <div class="slide-subtitle">Liste, formulare, meniuri contextuale în Excel</div>
+                <div class="two-col">
+                    <div class="steps">
+                        <h3>📋 Validare date (Liste)</h3>
+                        <div class="step-item"><div class="step-num">1</div><div class="step-body"><strong>Creare listă dropdown</strong><ul><li>Selectează celula → Data → <strong>Data Validation</strong></li><li>Allow: <strong>List</strong></li><li>Source: valorile separate cu <code>;</code> sau un interval</li><li>În celulă apare buton dropdown ▼</li></ul></div></div>
+                        <div class="step-item"><div class="step-num">2</div><div class="step-body"><strong>Mesaje de intrare / eroare</strong><ul><li>Fila <em>Input Message</em>: afișează sfat când e selectată celula</li><li>Fila <em>Error Alert</em>: configurează mesajul la date invalide</li></ul></div></div>
+                    </div>
+                    <div class="steps">
+                        <h3>📝 Formulare de date</h3>
+                        <div class="step-item"><div class="step-num">1</div><div class="step-body"><strong>Activare formular</strong><ul><li>Adaugă butonul <strong>Form…</strong> în Quick Access Toolbar</li><li>File → Options → Quick Access Toolbar → All Commands → Form</li></ul></div></div>
+                        <div class="step-item"><div class="step-num">2</div><div class="step-body"><strong>Utilizare formular</strong><ul><li>Click pe orice celulă din tabel → butonul Form</li><li>Se deschide un dialog cu câmpurile din antet</li><li><strong>New</strong> adaugă rând nou, <strong>Delete</strong> șterge, <strong>Find Prev/Next</strong> navigare</li></ul></div></div>
+                    </div>
+                </div>
+                <div class="steps" style="margin-top:16px">
+                    <h3>🖱️ Meniu contextual (Click dreapta)</h3>
+                    <div class="step-item"><div class="step-num">•</div><div class="step-body"><p>Click dreapta pe celulă → opțiuni rapide: <strong>Insert</strong>, <strong>Delete</strong>, <strong>Format Cells</strong> (Ctrl+1), <strong>Paste Special</strong>, <strong>Insert Comment</strong>, <strong>Define Name</strong></p></div></div>
+                    <div class="step-item"><div class="step-num">•</div><div class="step-body"><strong>AutoComplete</strong><p>Excel sugerează automat valori deja introduse în coloană. Apasă <strong>Enter</strong> pentru acceptare sau continuă să tastezi.</p></div></div>
+                    <div class="step-item"><div class="step-num">•</div><div class="step-body"><strong>Pick From Drop-down List</strong><p>Click dreapta pe celulă → <em>Pick From Drop-down List</em> → afișează toate valorile unice din coloana respectivă.</p></div></div>
+                </div>
+                <!-- IMAGINI SLIDE 3 — pune calea screenshot-ului in src="" -->
+                <div class="img-row">
+                    <img src="Screenshot 2026-03-11 101350.png">
+                    <img src="screenshot 2026-03-11 101505.png">
+                </div>
+            </div>
+
+            <!-- SLIDE 4: K65 -->
+            <div class="slide" id="slide-4">
+                <div class="slide-title">⚡ Taste rapide și Clipboard</div>
+                <div class="slide-subtitle">Scurtături esențiale și memoria Clipboard în Excel</div>
+                <div class="two-col">
+                    <div class="steps">
+                        <h3>⌨️ Taste rapide esențiale</h3>
+                        <div class="step-item"><div class="step-num">📁</div><div class="step-body"><strong>Navigare</strong><span class="tag">Ctrl+Home</span><span class="tag">Ctrl+End</span><span class="tag">Ctrl+↑↓←→</span><span class="tag">Ctrl+G (Go To)</span></div></div>
+                        <div class="step-item"><div class="step-num">✏️</div><div class="step-body"><strong>Editare</strong><span class="tag">F2 (edit celulă)</span><span class="tag">Delete</span><span class="tag">Ctrl+Z (Undo)</span><span class="tag">Ctrl+Y (Redo)</span><span class="tag">Ctrl+D (fill down)</span><span class="tag">Ctrl+R (fill right)</span></div></div>
+                        <div class="step-item"><div class="step-num">📋</div><div class="step-body"><strong>Copiere / Lipire</strong><span class="tag">Ctrl+C</span><span class="tag">Ctrl+X</span><span class="tag">Ctrl+V</span><span class="tag">Ctrl+Alt+V (Paste Special)</span></div></div>
+                        <div class="step-item"><div class="step-num">🎨</div><div class="step-body"><strong>Formatare</strong><span class="tag">Ctrl+1</span><span class="tag">Ctrl+B</span><span class="tag">Ctrl+I</span><span class="tag">Ctrl+U</span><span class="tag">Alt+H+H (culoare fundal)</span></div></div>
+                        <div class="step-item"><div class="step-num">📊</div><div class="step-body"><strong>Formule</strong><span class="tag">= (start formulă)</span><span class="tag">F4 (referință absolută)</span><span class="tag">Ctrl+` (afișare formule)</span><span class="tag">Alt+= (AutoSum)</span></div></div>
+                    </div>
+                    <div class="steps">
+                        <h3>📋 Memoria Clipboard</h3>
+                        <div class="step-item"><div class="step-num">1</div><div class="step-body"><strong>Clipboard Office (24 elemente)</strong><ul><li>Home → Clipboard → butonul de extindere ↗</li><li>Copiezi mai multe elemente → toate se salvează</li><li>Click pe orice element din panoul Clipboard pentru a-l lipi</li></ul></div></div>
+                        <div class="step-item"><div class="step-num">2</div><div class="step-body"><strong>Paste Special (Ctrl+Alt+V)</strong><ul><li><strong>Values</strong> — lipește doar valorile (fără formule)</li><li><strong>Formats</strong> — lipește doar formatarea</li><li><strong>Transpose</strong> — transpune rânduri↔coloane</li><li><strong>Operation</strong> — adunare/scădere/înmulțire la lipire</li></ul></div></div>
+                        <div class="step-item"><div class="step-num">3</div><div class="step-body"><strong>Undo History</strong><ul><li>Ctrl+Z — anulează ultima acțiune</li><li>Click pe săgeata de lângă Undo pentru a anula mai multe acțiuni deodată</li><li>Istoricul Undo se șterge la salvare</li></ul></div></div>
+                    </div>
+                </div>
+                <!-- IMAGINI SLIDE 4 — pune calea screenshot-ului in src="" -->
+                <div class="img-row">
+                    <img src="Screenshot 2026-03-11 101726.png">
+                    <img src="Screenshot 2026-03-11 101752.png">
+                </div>
+            </div>
+
+            <!-- SLIDE 5: K66 -->
+            <div class="slide" id="slide-5">
+                <div class="slide-title">🔄 Automatizarea seriilor de date</div>
+                <div class="slide-subtitle">AutoFill, serii personalizate și completare automată</div>
+                <div class="highlight-box"><strong>💡 AutoFill:</strong> Excel poate extinde automat o serie de date (numere, date calendaristice, luni, zile, text numeric) dacă tragi de <strong>mânerul de umplere</strong> (pătratul mic din colțul dreapta-jos al selecției).</div>
+                <div class="steps">
+                    <h3>📋 Tipuri de serii AutoFill</h3>
+                    <div class="step-item"><div class="step-num">1</div><div class="step-body"><strong>Serie numerică</strong><ul><li>Scrie 1 și 2 în două celule adiacente → selectează ambele → trage mânerul în jos/dreapta</li><li>Excel detectează pasul și continuă: 3, 4, 5…</li><li>Funcționează și cu pas negativ: 10, 8 → 6, 4, 2…</li></ul></div></div>
+                    <div class="step-item"><div class="step-num">2</div><div class="step-body"><strong>Serii de date calendaristice</strong><ul><li>Introdu o dată → trage mânerul → Excel completează zilele consecutive</li><li>Click pe <strong>AutoFill Options</strong> pentru a alege: Fill Days / Fill Weekdays / Fill Months / Fill Years</li></ul></div></div>
+                    <div class="step-item"><div class="step-num">3</div><div class="step-body"><strong>Serii text + număr</strong><ul><li>Scrie „Produs1" → trage → Excel completează: Produs2, Produs3…</li><li>Luni: „Ianuarie" → trage → Februarie, Martie…</li><li>Zile: „Luni" → trage → Marți, Miercuri…</li></ul></div></div>
+                    <div class="step-item"><div class="step-num">4</div><div class="step-body"><strong>Serii personalizate (Custom Lists)</strong><ul><li>File → Options → Advanced → <strong>Edit Custom Lists</strong></li><li>Adaugă lista ta (ex: „Nord, Sud, Est, Vest")</li></ul></div></div>
+                    <div class="step-item"><div class="step-num">5</div><div class="step-body"><strong>Fill Series (control avansat)</strong><ul><li>Home → Fill → <strong>Series…</strong></li><li>Setează: Type (Linear/Growth/Date/AutoFill), Step Value, Stop Value</li></ul></div></div>
+                </div>
+                <!-- IMAGINI SLIDE 5 — pune calea screenshot-ului in src="" -->
+                <div class="img-row">
+                    <img src="Screenshot 2026-03-11 102124.png">
+                    <img src="Screenshot 2026-03-11 102338.png">
+                </div>
+            </div>
+
+            <!-- SLIDE 6: S28 -->
+            <div class="slide" id="slide-6">
+                <div class="slide-title">🎯 Aptitudini practice</div>
+                <div class="slide-subtitle">Efectuarea operațiilor de formatare a celulelor — ce trebuie să știi</div>
+                <div class="cards-grid">
+                    <div class="card"><div class="card-header"><span class="card-icon">🎨</span><span class="card-title">Format Numbers</span></div><p>Aplică formate: General, Number, Currency, Accounting, Date, Time, Percentage, Fraction, Scientific, Text, Custom.</p><span class="tag">Ctrl+1</span><span class="tag">Home → Number</span></div>
+                    <div class="card"><div class="card-header"><span class="card-icon">📏</span><span class="card-title">Aliniere și orientare</span></div><p>Aliniere orizontală, verticală, orientare text, Wrap Text, Merge & Center, Shrink to Fit, Indent.</p></div>
+                    <div class="card"><div class="card-header"><span class="card-icon">🔤</span><span class="card-title">Font și culori</span></div><p>Font, Size, Bold, Italic, Underline, Strikethrough, Sub/Superscript, culoare text și culoare fundal (Fill).</p><span class="tag">Ctrl+B/I/U</span></div>
+                    <div class="card"><div class="card-header"><span class="card-icon">⬜</span><span class="card-title">Borduri (Borders)</span></div><p>Adaugă borduri pe toate laturile, exterior, interior, diagonal. Setează stilul liniei și culoarea.</p></div>
+                    <div class="card"><div class="card-header"><span class="card-icon">🌈</span><span class="card-title">Formatare condiționată (K67)</span></div><p>Home → Conditional Formatting → reguli bazate pe valori, text, date, ranguri, bare de date, scale de culori, seturi de icoane.</p><span class="tag">Highlight Rules</span><span class="tag">Data Bars</span></div>
+                    <div class="card"><div class="card-header"><span class="card-icon">🔒</span><span class="card-title">Protecție celule</span></div><p>Format Cells → Protection → bifează <strong>Locked</strong> → Review → Protect Sheet.</p></div>
+                </div>
+                <div class="highlight-box" style="margin-top:16px"><strong>📝 Rezumat S28:</strong> Stiluri de celule (K61) · Tipuri de date și formate (K63) · Introducere date cu validare și formulare (K64) · Taste rapide și Clipboard (K65) · AutoFill și serii (K66) · Format Cells dialog complet (Ctrl+1)</div>
+                <!-- IMAGINI SLIDE 6 — pune calea screenshot-ului in src="" -->
+                <div class="img-row">
+                    <img src="Screenshot 2026-03-11 102542.png">
+                    <img src="Screenshot 2026-03-11 094829.png">
+                </div>
+            </div>
+
+        </div><!-- end content-area -->
+    </div>
+
+    <div class="nav-footer">
+        <button class="nav-btn" id="prevBtn" onclick="prevSlide()" disabled>◄ Înapoi</button>
+        <button class="nav-btn primary" id="nextBtn" onclick="nextSlide()">Înainte ►</button>
+    </div>
+
+    <script>
+        let current = 0;
+        const total = 7;
+        function goTo(n) {
+            if (n < 0 || n >= total) return;
+            document.getElementById('slide-' + current).classList.remove('active');
+            document.getElementById('nav-' + current).classList.remove('active');
+            current = n;
+            document.getElementById('slide-' + current).classList.add('active');
+            document.getElementById('nav-' + current).classList.add('active');
+            document.getElementById('slideCounter').textContent = (current + 1) + ' / ' + total;
+            document.getElementById('progressFill').style.width = ((current + 1) / total * 100) + '%';
+            document.getElementById('prevBtn').disabled = current === 0;
+            document.getElementById('nextBtn').disabled = current === total - 1;
+        }
+        function nextSlide() { goTo(current + 1); }
+        function prevSlide() { goTo(current - 1); }
+        document.addEventListener('keydown', e => {
+            if (e.key === 'ArrowRight') nextSlide();
+            if (e.key === 'ArrowLeft') prevSlide();
+        });
+    </script>
+</body>
+</html>
